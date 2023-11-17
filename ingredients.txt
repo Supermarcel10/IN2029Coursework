@@ -1,0 +1,5 @@
+cake eggs 6
+cake flour 2.5
+cake sugar 2
+cookies sugar 3.5
+cookies oats 2
