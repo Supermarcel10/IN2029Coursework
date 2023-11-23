@@ -7,10 +7,10 @@ map<string, double> ingredients;
 
 int main() {
     // Read ingredients file
-    parseRecipes("/home/marcel/CLionProjects/CPPCoursework/ingredients.txt");
+    parseRecipes("../ingredients.txt");
 
     // Read orders file
-    ifstream file("/home/marcel/CLionProjects/CPPCoursework/orders.txt");
+    ifstream file("../orders.txt");
 
     string line;
     while (getline(file, line)) {
