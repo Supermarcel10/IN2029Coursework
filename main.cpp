@@ -1,6 +1,5 @@
 #include "recipe.h"
 #include <iostream>
-#include <chrono>
 
 using namespace std;
 
@@ -45,9 +44,6 @@ void parseOrders(ifstream& file) {
 }
 
 int main() {
-    // Start timer
-    auto start = chrono::high_resolution_clock::now();
-
     // Read ingredients file
     ifstream fIngredients("../ingredients.txt");
     parseRecipes(fIngredients);
@@ -58,11 +54,6 @@ int main() {
 
     // Print ingredients
     printIngredients(cout);
-
-    // Stop timer
-    auto stop = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
-    cout << "\nTime taken: " << duration.count() << "us\n";
 
     return 0;
 }
