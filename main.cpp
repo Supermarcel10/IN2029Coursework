@@ -1,21 +1,29 @@
 #include "recipe.h"
 #include <iostream>
+#include <chrono>
 
 using namespace std;
 
-map<string, double> ingredients;
+// Global hash map of ingredients
+// Unordered since I don't care about the order
+unordered_map<string, double> ingredients;
 
-int main() {
-    // Read ingredients file
-    parseRecipes("../ingredients.txt");
+// Print the ingredients to the output stream using string stream for efficiency
+void printIngredients(ostream& out) {
+    ostringstream oss;
+    for (auto& ingredient : ingredients) {
+        oss << ingredient.first << " " << ingredient.second << "\n";
+    }
+    out << oss.str();
+}
 
-    // Read orders file
-    ifstream file("../orders.txt");
-
+// Iterate through the file line by line and parse the recipes into a global map ingredients
+void parseOrders(ifstream& file) {
     string line;
+    stringstream ss;
     while (getline(file, line)) {
-        stringstream ss(line);
-
+        ss.clear();
+        ss.str(line);
         string recipeName;
         double quantity;
 
@@ -25,7 +33,7 @@ int main() {
 
         // If recipe is not found, skip it
         if (recipe == nullptr) {
-            cout << "Recipe \"" << recipeName << "\" not found!\nOmitting in calculation." << endl;
+            cerr << "Recipe \"" << recipeName << "\" not found!\nOmitting in calculation.\n";
             continue;
         }
 
@@ -34,12 +42,27 @@ int main() {
             ingredients[ingredient.first] += ingredient.second * quantity;
         }
     }
+}
+
+int main() {
+    // Start timer
+    auto start = chrono::high_resolution_clock::now();
+
+    // Read ingredients file
+    ifstream fIngredients("../ingredients.txt");
+    parseRecipes(fIngredients);
+
+    // Read orders file
+    ifstream fOrders("../orders.txt");
+    parseOrders(fOrders);
 
     // Print ingredients
-    for (auto& ingredient : ingredients) {
-        cout << ingredient.first << " " << ingredient.second << endl;
-    }
+    printIngredients(cout);
+
+    // Stop timer
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+    cout << "\nTime taken: " << duration.count() << "us\n";
 
     return 0;
 }
-

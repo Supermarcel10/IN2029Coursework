@@ -1,40 +1,24 @@
+#include <chrono>
 #include "recipe.h"
 
 using namespace std;
 
-vector<Recipe> Recipe::recipes;
+// Global hash map of recipes
+unordered_map<string, Recipe> Recipe::recipes;
 
+// Print the ingredients to the output stream using string stream for efficiency
 void Recipe::addIngredient(const string& ingredientName, const double& quantity) {
-    ingredients.insert(pair<string, double>(ingredientName, quantity));
+    ingredients.emplace(ingredientName, quantity);
 }
 
-Recipe* getRecipe(const std::string& recipeName) {
-    for (auto& r : Recipe::recipes) {
-        if (r.getRecipeName() == recipeName) return &r;
-    }
-
-    return nullptr;
-}
-
-Recipe& getOrMakeRecipe(const std::string& recipeName) {
-    // Search for the recipe
-    Recipe* recipe = getRecipe(recipeName);
-
-    // If recipe found, return it
-    if (recipe != nullptr) return *recipe;
-
-    // If recipe not found, create a new one
-    Recipe::recipes.emplace_back(recipeName);
-    return Recipe::recipes.back();
-}
-
-void parseRecipes(const string& filePath) {
-    ifstream file(filePath);
-
+// Parse the recipes file
+void parseRecipes(ifstream& file) {
     // Iterate through the file line by line
     string line;
+    stringstream ss;
     while (getline(file, line)) {
-        stringstream ss(line);
+        ss.clear();
+        ss.str(line);
         string recipeName, ingredient;
         double quantity;
 
@@ -43,4 +27,25 @@ void parseRecipes(const string& filePath) {
 
         getOrMakeRecipe(recipeName).addIngredient(ingredient, quantity);
     }
+}
+
+// Get recipe by name
+Recipe* getRecipe(const std::string& recipeName) {
+    auto it = Recipe::recipes.find(recipeName);
+    if (it != Recipe::recipes.end()) return &it->second;
+
+    return nullptr;
+}
+
+// Get recipe by name, if not found, create a new one
+Recipe& getOrMakeRecipe(const std::string& recipeName) {
+    // Search for the recipe
+    Recipe* recipe = getRecipe(recipeName);
+
+    // If recipe found, return it
+    if (recipe != nullptr) return *recipe;
+
+    // If recipe not found, create a new one
+    Recipe::recipes.emplace(recipeName, Recipe(recipeName));
+    return Recipe::recipes[recipeName];
 }
